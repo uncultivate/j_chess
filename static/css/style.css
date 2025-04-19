@@ -1,0 +1,400 @@
+/* style.css */
+
+/* General layout */
+body {
+    padding-top: 1rem; 
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.chess-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.analysis-panel {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 80px); /* Adjust based on header/padding */
+    overflow-y: auto;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.evaluation-bar {
+    width: 100%;
+    height: 24px; /* Slightly taller */
+    background-color: #e9ecef;
+    border-radius: 8px; /* More rounded corners */
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    border: 1px solid #dee2e6; /* Add a light border */
+}
+
+.evaluation-fill {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    transition: width 0.3s ease, left 0.3s ease, background-color 0.3s ease;
+}
+
+.evaluation-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-shadow: 0px 0px 2px #fff, 0px 0px 2px #fff; /* Text outline for visibility */
+    z-index: 3;
+    pointer-events: none;
+}
+
+.analysis-content {
+    margin-top: 20px;
+}
+
+.best-moves, .learning-insights, .positional-features {
+    background-color: white;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+#board {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .chess-container {
+        padding: 10px;
+    }
+    
+    #board {
+        width: 100% !important;
+        max-width: 400px;
+    }
+    
+    .analysis-panel {
+        margin-top: 20px;
+    }
+}
+
+/* Move arrows styling */
+.move-arrow {
+    position: absolute;
+    height: 5px; 
+    transform-origin: 0 50%;
+    pointer-events: none; 
+    border-radius: 3px;
+    transition: background-color 0.3s, opacity 0.3s, height 0.3s; /* Added transitions */
+}
+
+.move-arrow::after { /* Basic arrowhead shape */
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 12px; 
+    height: 12px;
+    /* Border color set by specific class below */
+    transition: border-color 0.3s, width 0.3s, height 0.3s; /* Added transitions */
+}
+
+/* Style for the BEST move */
+.move-arrow.arrow-best {
+    background-color: rgba(0, 150, 0, 0.85); /* Solid green, slightly more opaque */
+    height: 7px; /* Slightly thicker */
+    opacity: 0.9;
+    z-index: 10; /* Ensure best is on top if overlap */
+}
+.move-arrow.arrow-best::after {
+    border-top: 7px solid rgba(0, 150, 0, 0.85);
+    border-right: 7px solid rgba(0, 150, 0, 0.85);
+    width: 14px; 
+    height: 14px;
+}
+
+/* Style for OTHER suggested moves */
+.move-arrow.arrow-alternative {
+    background-color: rgba(255, 165, 0, 0.5); /* Fainter orange */
+    height: 4px; /* Thinner */
+    opacity: 0.6;
+    z-index: 9;
+}
+.move-arrow.arrow-alternative::after {
+    border-top: 4px solid rgba(255, 165, 0, 0.5);
+    border-right: 4px solid rgba(255, 165, 0, 0.5);
+    width: 10px; 
+    height: 10px;
+}
+
+.best-moves .move-item,
+.learning-insights div,
+.positional-features div {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #eee;
+    transition: border-color 0.3s;
+}
+
+.best-moves .move-item:last-child,
+.learning-insights div:last-child,
+.positional-features div:last-child {
+    border-bottom: none;
+}
+
+.move-item .evaluation {
+    float: right;
+    font-weight: bold;
+    color: #6c757d;
+    transition: color 0.3s;
+}
+
+/* Engine Settings Collapse Icon */
+.settings-header {
+    cursor: pointer;
+}
+.settings-header .collapse-icon {
+    transition: transform 0.3s ease;
+}
+.settings-header[aria-expanded="false"] .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+.analysis-panel h3 {
+    font-size: 1.5rem; /* Adjust as needed */
+    margin-bottom: 1rem;
+}
+
+.analysis-panel h4 {
+    font-size: 1.1rem; /* Adjust as needed */
+    margin-bottom: 0.75rem;
+}
+
+/* --- Dark Mode Styles --- */
+body.dark-mode {
+    background-color: #212529;
+    color: #f8f9fa; /* Change base text to lighter grey/off-white */
+}
+
+body.dark-mode .analysis-panel {
+    background-color: #343a40; /* Panel background */
+    color: #fff; /* Change panel base text to white */
+    border: 1px solid #495057;
+}
+
+/* Dark mode for specific sections inside the panel */
+body.dark-mode .best-moves,
+body.dark-mode .learning-insights,
+body.dark-mode .positional-features,
+body.dark-mode .engine-settings,
+body.dark-mode .analysis-details {
+    background-color: #495057; /* Darker grey for sections */
+    color: #fff; /* Ensure text is white */
+    border: 1px solid #5a6268; /* Slightly lighter border for sections */
+}
+
+body.dark-mode .settings-header h4,
+body.dark-mode .analysis-header h4 {
+    color: #fff; /* Ensure header text is white */
+}
+body.dark-mode .settings-header:hover h4,
+body.dark-mode .analysis-header:hover h4 {
+    color: #f8f9fa; /* Slightly off-white on hover */
+}
+
+body.dark-mode .modal-content {
+    background-color: #343a40;
+    color: #fff; /* Modal text white */
+}
+
+body.dark-mode .modal-header {
+    border-bottom: 1px solid #495057;
+}
+
+body.dark-mode .modal-footer {
+    border-top: 1px solid #495057;
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode .best-moves .move-item,
+body.dark-mode .learning-insights div,
+body.dark-mode .positional-features div {
+    border-bottom: 1px solid #5a6268; /* Match section border */
+    color: #fff; /* Ensure sub-item text is white */
+}
+
+body.dark-mode .move-item .evaluation {
+    color: #ddd; /* Make evaluation slightly less prominent than main text */
+}
+
+/* Adjust button outlines for dark mode */
+body.dark-mode .btn-outline-secondary {
+    color: #fff; /* Button text white */
+    border-color: #6c757d;
+}
+body.dark-mode .btn-check:checked + .btn-outline-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+}
+body.dark-mode .btn-check:focus + .btn-outline-secondary {
+    box-shadow: 0 0 0 0.25rem rgba(130, 138, 145, 0.5); /* Adjusted focus color */
+}
+
+/* Input range styles for dark mode */
+body.dark-mode .form-range::-webkit-slider-thumb {
+    background-color: #dee2e6; /* Keep thumb light */
+}
+body.dark-mode .form-range::-moz-range-thumb {
+    background-color: #dee2e6; /* Keep thumb light */
+}
+body.dark-mode .form-label,
+body.dark-mode .text-muted {
+    color: #fff !important; /* Form labels and muted text white */
+}
+
+/* Style for the toggle switch itself in dark mode (optional) */
+body.dark-mode .form-switch .form-check-input {
+    background-color: #495057; 
+    border-color: rgba(255, 255, 255, 0.25);
+}
+body.dark-mode .form-switch .form-check-input:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(222, 226, 230, 0.25);
+}
+body.dark-mode .form-switch .form-check-input:checked {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.engine-settings {
+    background-color: white;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.settings-header h4 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #444;
+}
+
+.settings-header:hover h4 {
+    color: #000;
+}
+
+#engineSettingsContent {
+    transition: all 0.2s ease-in-out;
+}
+
+#engineSettingsContent.collapsing {
+    overflow: hidden;
+}
+
+.setting-control {
+    padding: 5px 0;
+}
+
+.setting-control .form-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.setting-control .text-muted {
+    font-size: 0.8rem;
+    margin-top: 2px;
+}
+
+/* Input range styles for dark mode */
+/* ... */
+
+/* Engine Settings Collapse Icon */
+/* ... */
+
+/* Make sure inner analysis sections don't have double backgrounds/borders in dark mode */
+body.dark-mode .analysis-details .best-moves,
+body.dark-mode .analysis-details .learning-insights,
+body.dark-mode .analysis-details .positional-features {
+    background-color: transparent; /* Remove inner background */
+    border: none; /* Remove inner border */
+    box-shadow: none; /* Remove inner shadow */
+    padding: 0; /* Adjust padding if needed */
+    margin-bottom: 1rem; /* Add some spacing */
+}
+
+/* Adjust padding/margin for inner elements if needed */
+body.dark-mode .analysis-details .analysis-content h4 {
+    margin-top: 1rem;
+}
+
+/* Dark mode adjustments for evaluation bar */
+body.dark-mode .evaluation-bar {
+    background-color: #343a40;
+    border-color: #495057;
+}
+
+body.dark-mode .evaluation-label {
+    color: #fff;
+    text-shadow: 0px 0px 2px #000, 0px 0px 2px #000;
+}
+
+.move-counter {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 40px;
+    text-align: center;
+}
+
+body.dark-mode .move-counter {
+    color: #fff;
+}
+
+.move-navigation {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+body.dark-mode .move-navigation {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Make navigation buttons more compact */
+.move-navigation .btn {
+    padding: 4px 8px;
+} 

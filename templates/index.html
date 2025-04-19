@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J Chess - Chess Learning Platform</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <!-- Title and Dark Mode Toggle Removed from here -->
+
+        <div class="row">
+            <!-- Chess Board -->
+            <div class="col-md-8">
+                <!-- Centered Title Above Board -->
+                <h1 class="text-center mb-3">J Chess</h1> 
+                <div class="chess-container">
+                    <div id="board" style="width: 600px"></div>
+                    <div class="controls mt-3">
+                        <button id="newGame" class="btn btn-primary">New Game</button>
+                        <button id="undoMove" class="btn btn-secondary">Undo</button>
+                        <button id="flipBoard" class="btn btn-info">Flip Board</button>
+                        <div class="move-navigation d-inline-flex align-items-center ms-2">
+                            <button id="moveBack" class="btn btn-outline-dark"><i class="fas fa-chevron-left"></i></button>
+                            <span id="moveHistoryStatus" class="move-counter mx-2">0/0</span>
+                            <button id="moveForward" class="btn btn-outline-dark"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analysis Panel -->
+            <div class="col-md-4">
+                <div class="analysis-panel">
+                    <!-- Dark Mode Toggle Moved Here -->
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle">
+                            <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+                        </div>
+                    </div>
+
+                    <h3>Position Analysis</h3>
+                    
+                    <!-- Evaluation Bar (Moved outside collapsible section) -->
+                    <div id="evaluationBar" class="evaluation-bar mb-4">
+                        <div class="evaluation-fill"></div>
+                        <div class="evaluation-label">Even</div>
+                    </div>
+                    
+                    <!-- Engine Settings -->
+                    <div class="engine-settings mb-4 p-3 border rounded">
+                        <div class="settings-header" data-bs-toggle="collapse" data-bs-target="#engineSettingsContent" aria-expanded="true" aria-controls="engineSettingsContent">
+                            <h4>
+                                <i class="fas fa-caret-down collapse-icon"></i>
+                                Engine Settings
+                            </h4>
+                        </div>
+                        <div id="engineSettingsContent" class="collapse show">
+                            <!-- AI Side Selection -->
+                            <div class="setting-control mb-3">
+                                <label class="form-label">AI Plays As</label>
+                                <div class="btn-group w-100" role="group" aria-label="AI side selection">
+                                    <input type="radio" class="btn-check" name="aiSide" id="aiNone" value="none">
+                                    <label class="btn btn-outline-secondary" for="aiNone">None</label>
+                                    
+                                    <input type="radio" class="btn-check" name="aiSide" id="aiWhite" value="white">
+                                    <label class="btn btn-outline-secondary" for="aiWhite">White</label>
+                                    
+                                    <input type="radio" class="btn-check" name="aiSide" id="aiBlack" value="black" checked>
+                                    <label class="btn btn-outline-secondary" for="aiBlack">Black</label>
+                                </div>
+                                <small class="text-muted d-block">Select which side the AI should play</small>
+                            </div>
+                            
+                            <div class="setting-control mb-3">
+                                <label for="depthRange" class="form-label">
+                                    AI Opponent Depth: <span id="depthValue">5</span>
+                                </label>
+                                <input type="range" class="form-range" id="depthRange" 
+                                       min="1" max="20" value="5">
+                                <small class="text-muted d-block">Affects AI move strength (Analysis uses fixed depth)</small>
+                            </div>
+                            
+                            <div class="setting-control mb-3">
+                                <label for="skillRange" class="form-label">
+                                    AI Skill Level: <span id="skillValue">10</span>
+                                </label>
+                                <input type="range" class="form-range" id="skillRange" 
+                                       min="0" max="20" value="10">
+                                <small class="text-muted d-block">Lower skill = more blunders</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Analysis Details Section -->
+                    <div class="analysis-details mb-4 p-3 border rounded">
+                        <div class="analysis-header settings-header" data-bs-toggle="collapse" data-bs-target="#analysisDetailsContent" aria-expanded="true" aria-controls="analysisDetailsContent">
+                            <h4>
+                                <i class="fas fa-caret-down collapse-icon"></i>
+                                Analysis Details 
+                            </h4>
+                        </div>
+                        <div id="analysisDetailsContent" class="collapse show">
+                            <div class="analysis-content mt-3">
+                                <h4>Best Moves</h4>
+                                <div id="bestMoves" class="best-moves"></div>
+                                
+                                <h4>Learning Insights</h4>
+                                <div id="learningInsights" class="learning-insights"></div>
+                                
+                                <h4>Positional Features</h4>
+                                <div id="positionalFeatures" class="positional-features"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="gameOverModalLabel">Game Over</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="gameOverMessage">
+            <!-- Game result message will be inserted here -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="modalNewGame">New Game</button>
+            <!-- Optional: Add a review button later -->
+            <!-- <button type="button" class="btn btn-info" id="modalReviewGame">Review Game</button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html> 
